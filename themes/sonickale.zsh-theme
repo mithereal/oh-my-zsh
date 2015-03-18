@@ -4,6 +4,9 @@
 # https://github.com/topfunky/zsh-simple
 #
 
+if [[ -z $ZSH_THEME_ADMIN_PREFIX ]]; then
+    ZSH_THEME_ADMIN_PREFIX='☁'
+fi
 
 setopt promptsubst
 
@@ -19,9 +22,11 @@ GIT_CLEAN_COLOR=$FG[148]
 GIT_PROMPT_INFO=$FG[148]
 
 # Hash
-ROOT_ICON="$fg_bold[red]%}#:{$reset_color%}"
+
 if [[ $EUID -ne 0 ]] ; then
-	ROOT_ICON=""
+	USER_ICON="%(?,%{$PROMPT_SUCCESS_COLOR%} ☺ %{$reset_color%},%{$PROMPT_FAILURE_COLOR%} ☹ %{$reset_color%})"
+elif [[ $EUID == 0 ]] ; then
+	USER_ICON="$fg_bold[red]%}$ZSH_THEME_ADMIN_PREFIX{$reset_color%} "
 fi
 git_repo_path() {
   git rev-parse --git-dir 2>/dev/null
@@ -46,27 +51,20 @@ git_prompt() {
   local cb=$(current_branch)
   if [ -n "$cb" ]; then
     local repo_path=$(git_repo_path)
-    echo " %{$fg_bold[grey]%}$cb %{$fg[white]%}$(git_commit_id)%{$reset_color%}$(git_mode)"
+    echo " %{$fg_bold[grey]%}$cb %{$fg[white]%}$(git_commit_id)%{$reset_color%}$(git_mode)$(git_dirty)"
   fi
 }
 
-local smiley="%(?,%{$PROMPT_SUCCESS_COLOR%} ☺%{$reset_color%},%{$PROMPT_FAILURE_COLOR%}☹%{$reset_color%})"
+git_dirty() {
+  if [[  `git ls-files -m` != "" ]]; then
+    echo " %{$fg_bold[red]%}✗ %{$reset_color%}"
+  fi
+}
 
 PROMPT='
-%{$ROOT_ICON_COLOR%}$ROOT_ICON%{$reset_color%}%{$MACHINE_NAME_COLOR%}%m➜  %{$reset_color%}%{$PROMPT_SUCCESS_COLOR%}%c%{$reset_color%}
-${smiley}  %{$reset_color%}'
+%{$MACHINE_NAME_COLOR%}%m➜  %{$reset_color%}%{$PROMPT_SUCCESS_COLOR%}%c%{$reset_color%}
+$USER_ICON '
 
-RPROMPT='%{$fg[white]%} $(git_prompt)%{$fg_bold[red] $(git_prompt_status) %{$reset_color%}'
+RPROMPT='%{$fg[white]%} $(git_prompt) %{$reset_color%} '
 
 
-ZSH_THEME_GIT_PROMPT_PREFIX=": "
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$GIT_PROMPT_INFO%} :"
-ZSH_THEME_GIT_PROMPT_DIRTY=" %{$GIT_DIRTY_COLOR%}✘"
-ZSH_THEME_GIT_PROMPT_CLEAN=" %{$GIT_CLEAN_COLOR%}✔"
-
-ZSH_THEME_GIT_PROMPT_ADDED="%{$FG[103]%}✚%{$rset_color%}"
-ZSH_THEME_GIT_PROMPT_MODIFIED="%{$FG[103]%}✹%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DELETED="%{$FG[103]%}✖%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_RENAMED="%{$FG[103]%}➜%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_UNMERGED="%{$FG[103]%}═%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$FG[103]%}✭%{$reset_color%}"
