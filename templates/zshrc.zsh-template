@@ -46,6 +46,16 @@ ZSH_THEME="sonickale"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
+plugins=(git-extras)
+plugins=(docker)
+plugins=(tugboat)
+plugins=(sudo)
+plugins=(perms)
+plugins=(per-directory-history)
+plugins=(lol)
+plugins=(common-aliases)
+plugins=(history)
+plugins=(command-not-found)
 
 # User configuration
 
@@ -68,7 +78,7 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch x86_64"
 
 # ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
+ export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
